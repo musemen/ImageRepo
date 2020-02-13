@@ -13,9 +13,9 @@ from __init__ import app
 fe = FeatureExtractor()
 features = []
 img_paths = []
-for feature_path in glob.glob("static/feature/*"):
+for feature_path in glob.glob("application/static/feature/*"):
     features.append(pickle.load(open(feature_path, 'rb')))
-    img_paths.append('static/img/' + os.path.splitext(os.path.basename(feature_path))[0] + '.jpg')
+    img_paths.append('application/static/img/' + os.path.splitext(os.path.basename(feature_path))[0] + '.jpg')
 
 main = Blueprint('main', __name__)
 
@@ -47,7 +47,7 @@ def index():
         file = request.files['query_img']
 
         img = Image.open(file.stream)  # PIL image
-        uploaded_img_path = "static/uploaded/" + datetime.now().isoformat() + "_" + file.filename
+        uploaded_img_path = "application/static/uploaded/" + datetime.now().isoformat() + "_" + file.filename
         img.save(uploaded_img_path)
 
         query = fe.extract(img)

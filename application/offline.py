@@ -5,12 +5,15 @@ from PIL import Image
 from feature_extractor import FeatureExtractor
 
 fe = FeatureExtractor()
-paths = sorted(glob.glob('application/static/img/*.jpg'))
-print(paths)
+paths = sorted(glob.glob('static/img/*.jpg'))
 
-for img_path in sorted(glob.glob('application/static/img/*.jpg')):
+parentDirectory = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+
+print(parentDirectory)
+print(paths)
+for img_path in sorted(glob.glob('static/img/*.jpg')):
     print(img_path)
     img = Image.open(img_path)  # PIL image
     feature = fe.extract(img)
-    feature_path = 'application/static/feature/' + os.path.splitext(os.path.basename(img_path))[0] + '.pkl'
+    feature_path = 'static/feature/' + os.path.splitext(os.path.basename(img_path))[0] + '.pkl'
     pickle.dump(feature, open(feature_path, 'wb'))

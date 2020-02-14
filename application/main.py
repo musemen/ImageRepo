@@ -1,48 +1,59 @@
 import os
 import numpy as np
+import secrets
 from PIL import Image
 from feature_extractor import FeatureExtractor
 import glob
-import flask_login as fl
+from flask import render_template, url_for, flash, redirect, request
 import pickle
 from datetime import datetime
-from flask import Flask, request, render_template, Blueprint
-from flask_sqlalchemy import SQLAlchemy
+from flask_login import login_user, current_user, logout_user, login_required
+from __init__ import db, bcrypt, app
+from models import User
+from forms import  RegistrationForm, LoginForm
 
 # Read image features
 fe = FeatureExtractor()
 features = []
 img_paths = []
-for feature_path in glob.glob("static/feature/*"):
+for feature_path in glob.glob("application/static/feature/*"):
     features.append(pickle.load(open(feature_path, 'rb')))
     # print(feature_path)
-    # print('static/img/' + os.path.splitext(os.path.basename(feature_path))[0] + '.jpg')
-    img_paths.append('static/img/' + os.path.splitext(os.path.basename(feature_path))[0] + '.jpg')
+    print('application/static/img/' + os.path.splitext(os.path.basename(feature_path))[0] + '.jpg')
+    img_paths.append('application/static/img/' + os.path.splitext(os.path.basename(feature_path))[0] + '.jpg')
 
 
-db = SQLAlchemy()
-app = Flask(__name__)
-
-app.config['SECRET_KEY'] = '9OLWxND4o83j4K4iuopO'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
-
-db.init_app(app)
-
-@app.route('/')
+@app.route('/',  methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
 
-@app.route('/signup')
-def signup():
-    return render_template('signup.html')
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user, remember=form.remember.data)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('index'))
+        else:
+            flash('Login Unsuccessful. Please check email and password', 'danger')
+    return render_template('login.html', title='Login', form=form)
 
-@app.route('/logout')
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        db.session.add(user)
+        db.session.commit()
+        flash('Your account has been created! You are now able to log in', 'success')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Register', form=form)
+
+
+@app.route("/logout")
 def logout():
-    return render_template("login.html")
-
-@app.route('/profile')
-def profile():
-    return render_template('profile.html')
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -50,14 +61,14 @@ def index():
         file = request.files['query_img']
 
         img = Image.open(file.stream)  # PIL image
-        uploaded_img_path = "static/uploaded/" + datetime.now().isoformat() + "_" + file.filename
+        uploaded_img_path = "application/static/uploaded/" + datetime.now().isoformat() + "_" + file.filename
         img.save(uploaded_img_path)
         query = fe.extract(img)
         dists = np.linalg.norm(features - query, axis=1)  # Do search
         ids = np.argsort(dists)[:10] # Top 30 results
         scores = []
         for id in ids:
-            if dists[id] > 1.1 and dists[id] < 1.2 :
+            if dists[id] > 0.0 and dists[id] < 1.2 :
                 scores.append((dists[id], img_paths[id]))
 
         print(scores)

@@ -1,9 +1,6 @@
 application/static/*
-!application/static/feature
-!application/static/img
-!application/static/uploaded
-!.gitkeep
-
+.vscode
+.DS_Store
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

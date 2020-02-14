@@ -1,13 +1,17 @@
-<!doctype html>
-<html>
+
+{% extends "layout.html" %}
+{% block content %}
+    
     <head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></head>
     <body>
         <div class="container">
             <h1>Simple image search engine</h1>
+            <br>
             <form method="POST" enctype="multipart/form-data">
-                <input type="file" name="query_img"><br>
-                <input type="submit">
+                <input type="file" name="query_img" style="text-align:center;"><br>
+                <input type="submit" style="background-color: black;">
             </form>
+            <br>
             <h2>Query:</h2>
             {% if query_path %}
             <img src="{{ query_path }}" width="300px">
@@ -24,3 +28,4 @@
 </html>
 
 
+{% endblock %}

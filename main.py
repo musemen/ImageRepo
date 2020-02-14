@@ -65,10 +65,10 @@ def index():
         img.save(uploaded_img_path)
         query = fe.extract(img)
         dists = np.linalg.norm(features - query, axis=1)  # Do search
-        ids = np.argsort(dists)[:10] # Top 30 results
+        ids = np.argsort(dists)[:15] # Top 30 results
         scores = []
         for id in ids:
-            if dists[id] > 0.0 and dists[id] < 1.2 :
+            if dists[id] >= 1.0 and dists[id] < 1.2 :
                 scores.append((dists[id], img_paths[id]))
 
         print(scores)

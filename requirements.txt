@@ -8,3 +8,9 @@ tensorflow>=2.0.0
 tensorflow-estimator>=2.0.1
 flask-sqlalchemy
 flask-login
+datetime
+numpy
+flask_wtf
+wtforms
+flask_bcrypt
+flask_sqlalchemy

@@ -7,10 +7,6 @@ from feature_extractor import FeatureExtractor
 fe = FeatureExtractor()
 paths = sorted(glob.glob('static/img/*.jpg'))
 
-parentDirectory = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-print(parentDirectory)
-print(paths)
 for img_path in sorted(glob.glob('static/img/*.jpg')):
     print(img_path)
     img = Image.open(img_path)  # PIL image

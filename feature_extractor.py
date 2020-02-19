@@ -15,6 +15,7 @@ class FeatureExtractor:
         x = image.img_to_array(img)  # To np.array. Height x Width x Channel. dtype=float32
         x = np.expand_dims(x, axis=0)  # (H, W, C)->(1, H, W, C), where the first elem is the number of img
         x = preprocess_input(x)  # Subtracting avg values for each pixel
-
         feature = self.model.predict(x)[0]  # (1, 4096) -> (4096, )
+        # print(feature / np.linalg.norm(feature))
         return feature / np.linalg.norm(feature)  # Normalize
+

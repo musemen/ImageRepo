@@ -64,7 +64,7 @@ def index():
         uploaded_img_path = "static/uploaded/" + datetime.now().isoformat() + "_" + file.filename
         img.save(uploaded_img_path)
         query = fe.extract(img)
-        dists = np.linalg.norm(features - query, axis=1)  # Do search
+        dists = np.linalg.norm(features - query, axis=1)  
         ids = np.argsort(dists)[:15] # Top 30 results
         scores = []
         for id in ids:
